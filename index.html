@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Explore Sri Lanka</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script>
+    $(document).ready(function(){
+
+      $("#searchButton").click(function() {
+        console.log("clicked")
+        $('#sample_data').empty();
+        $.ajax({
+          type: "GET",
+          xhrFields: {
+            withCredentials: true
+          },
+          url: "http://localhost:9200/items/_search?q="+ $("#searchTerm").val() +"&from="+'0'+"&size="+'1000',
+          success: function(result) {
+            console.log(result)
+
+            jQuery.each(result.hits.hits, function(i, val) {
+              // here you can do your magic
+
+              title = val._source.title
+              url = val._source.url
+              description = val._source.description
+              category = val._source.category
+              score = val._score
+
+              console.log(title)
+              console.log(category)
+
+              $('#sample_data').append(
+                $('<li>').attr('class',"card").append($('h5').attr('class',"card-link")).append($('<a>').attr('href',url).append($('<span>').attr('class',"card-title").append(title)))
+                .append($('<h6>').attr('class',"card-subtitle mb-2 text-muted").append(url))
+                .append($('<p>').attr('class',"card-text").append(description.substring(0,300)+"..."))
+                .append($('<h8>').attr('class',"card-text").attr('style',"font-size: 12px;").append('Score - '+score))  
+                );
+
+            });
+          }
+        });
+      });
+
+    });
+  </script>
+
+  <style>
+    @import url(https://fonts.googleapis.com/css?family=Open+Sans);
+
+    /* body{
+    background: #f2f2f2;
+    font-family: 'Open Sans', sans-serif;
+  } */
+
+    .search {
+      width: 100%;
+      position: relative
+    }
+
+    .searchTerm {
+      float: left;
+      width: 100%;
+      border: 3px solid navy;
+      padding: 5px;
+      height: 20px;
+      border-radius: 5px;
+      outline: none;
+      color: #9DBFAF;
+    }
+
+    .searchTerm:focus {
+      color: navy;
+    }
+
+    .searchButton {
+      position: absolute;
+      right: 0px;
+      width: 40px;
+      height: 36px;
+      border: 1px solid navy;
+      background: navy;
+      text-align: center;
+      color: #fff;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    /*Resize the wrap to see the search bar change!*/
+    .wrap {
+      width: 30%;
+      position: relative;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .jumbotron_back {
+      background: powderblue ;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="jumbotron text-center jumbotron_back" style="margin-bottom:0">
+    <h1 style=" color:navy">Explore Sri Lanka</h1>
+    <div class="wrap">
+      <div class="search">
+        <!-- <form action=""> -->
+          <input id="searchTerm" type="text" class="searchTerm h-100 w-100 pr-0 mr-0" placeholder="What are you looking for?">
+          <button id="searchButton" type="submit" class="searchButton ml-0 pl-0">
+            <i class="fa fa-search"></i>
+          </button>
+        <!-- </form> -->
+      </div>
+    </div>
+  </div>
+  
+  <div class="container">
+      <ul id="sample_data" style="list-style-type:none;">
+
+      </ul>
+  </div>
+
+</body>
+
+</html>
