@@ -33,21 +33,40 @@
               description = val._source.description
               category = val._source.category
               score = val._score
+              // console.log(title)
+              sentences = description.split("."||",");
 
-              console.log(title)
-              console.log(category)
+              var matching_sentences = [];
+              var i;
+              for (i = 0; i < sentences.length; i++) { 
+                sentences[i].trim();
+                if(sentences[i].includes($("#searchTerm").val())){
+                  // console.log(sentences[i])
+                  matching_sentences.push(sentences[i]);
+                }
+              }
+              console.log("------------------------------------------")
+
+              var description_element = matching_sentences[0];
+              if( description_element != undefined){
+                var repl = '<span class="font-weight-bold">' + $("#searchTerm").val() + '</span>';
+                description_element = description_element.replace($("#searchTerm").val(), repl);
+              }
 
               $('#sample_data').append(
-                $('<li>').attr('class',"card").append($('h5').attr('class',"card-link")).append($('<a>').attr('href',url).append($('<span>').attr('class',"card-title").append(title)))
-                .append($('<h6>').attr('class',"card-subtitle mb-2 text-muted").append(url))
-                .append($('<p>').attr('class',"card-text").append(description.substring(0,300)+"..."))
-                .append($('<h8>').attr('class',"card-text").attr('style',"font-size: 12px;").append('Score - '+score))  
-                );
+              $('<li>').attr('class',"card card-body my-2")
+              .append($('<h4>').append($('<a>').attr('href',url).append($('<span>').attr('class',"card-title").attr('style',"color:black").text(title))))
+              .append($('<h6>').attr('class',"card-subtitle mb-2 text-muted").append($('<a>').attr('href',url).append(url_element)))
+              .append($('<p>').attr('class',"card-text").append(description_element))
+              // .append($('<p>').attr('class',"card-text").append(description.substring(0,300)+"..."))
+              // .append($('<h8>').attr('class',"card-text").attr('style',"font-size: 12px;").append('Score - '+score))  
+              );
 
             });
           }
         });
       });
+
 
     });
   </script>
@@ -106,6 +125,10 @@
     .jumbotron_back {
       background: powderblue ;
     }
+
+    .title-of-card{
+      font-size: 2cm;
+    }
   </style>
 </head>
 
@@ -129,6 +152,9 @@
       <ul id="sample_data" style="list-style-type:none;">
 
       </ul>
+      <!-- <div id="sample_data" style="list-style-type:none;">
+
+      </div> -->
   </div>
 
 </body>
