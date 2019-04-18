@@ -14,7 +14,7 @@
     $(document).ready(function(){
 
       $("#searchButton").click(function() {
-        console.log("clicked")
+        // console.log("clicked")
         $('#sample_data').empty();
         $.ajax({
           type: "GET",
@@ -34,29 +34,54 @@
               category = val._source.category
               score = val._score
               // console.log(title)
-              sentences = description.split("."||",");
-
+              
+              var search_terms = [];
+              search_term = $("#searchTerm").val();
+              // if(search_term[0]==""" & search_term[-1]==""" ){
+              //   console.log("IN");
+              //   search_terms.push(search_term);
+              // }else{
+              var separators = ['title:','category:','url:','description:','AND','NOT','OR'];
+              var tokens = search_term.split(new RegExp(separators.join('|'), 'g'));
+              var x;
+              for (x = 0; x < tokens.length; x++) { 
+                tokens[x] = tokens[x].trim();
+                if(tokens[x]!=""){
+                  search_terms.push(tokens[x]);
+                }
+              }    
+              console.log(search_terms);
+              // }
+             
               var matching_sentences = [];
+              sentences = description.split(".");
               var i;
               for (i = 0; i < sentences.length; i++) { 
                 sentences[i].trim();
-                if(sentences[i].includes($("#searchTerm").val())){
-                  // console.log(sentences[i])
+                if (new RegExp(search_terms.join("|")).test(sentences[i])) {
+                  // console.log(sentences[i]);
                   matching_sentences.push(sentences[i]);
-                }
+                }                
               }
-              console.log("------------------------------------------")
+              // console.log("------------------------------------------")
 
               var description_element = matching_sentences[0];
               if( description_element != undefined){
-                var repl = '<span class="font-weight-bold">' + $("#searchTerm").val() + '</span>';
-                description_element = description_element.replace($("#searchTerm").val(), repl);
-              }
 
+                var u;
+                for (u = 0; u < search_terms.length; u++) { 
+                  var repl = '<span class="font-weight-bold">' + search_terms[u] + '</span>';
+                  description_element = description_element.replace(search_terms[u], repl);
+                }
+                // var repl = '<span class="font-weight-bold">' + $("#searchTerm").val() + '</span>';
+                // description_element = description_element.replace($("#searchTerm").val(), repl);
+              }else{
+                description_element = description.substring(0,300)+"..."
+              }
               $('#sample_data').append(
               $('<li>').attr('class',"card card-body my-2")
               .append($('<h4>').append($('<a>').attr('href',url).append($('<span>').attr('class',"card-title").attr('style',"color:black").text(title))))
-              .append($('<h6>').attr('class',"card-subtitle mb-2 text-muted").append($('<a>').attr('href',url).append(url_element)))
+              .append($('<h6>').attr('class',"card-subtitle mb-2 text-muted").append($('<a>').attr('href',url).append(url)))
               .append($('<p>').attr('class',"card-text").append(description_element))
               // .append($('<p>').attr('class',"card-text").append(description.substring(0,300)+"..."))
               // .append($('<h8>').attr('class',"card-text").attr('style',"font-size: 12px;").append('Score - '+score))  
